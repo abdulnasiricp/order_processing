@@ -3,6 +3,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:order_processing/views/ForgotScreen.dart';
 import 'package:order_processing/views/homeScreen.dart';
@@ -110,6 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           var loginEmail = loginEmailController.text.trim();
                           var loginPassword =
                               loginPasswordController.text.trim();
+
+                              EasyLoading.show();
                           try {
                             final User? firebaseUser = (await FirebaseAuth
                                     .instance
@@ -119,11 +122,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                 .user;
                             if (firebaseUser != null) {
                               Get.to(()=> const HomeScreen());
+                              EasyLoading.dismiss();
+
                             } else {
                               print('Check Email & Password');
+                              EasyLoading.dismiss();
                             }
                           } on FirebaseAuthException catch (e) {
                             print('Errer $e');
+                              EasyLoading.dismiss();
+
                           }
                         },
                         child: const Text('Login')),

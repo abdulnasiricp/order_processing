@@ -1,9 +1,13 @@
-// ignore_for_file: file_names, avoid_unnecessary_containers, sized_box_for_whitespace
+// ignore_for_file: file_names, avoid_unnecessary_containers, sized_box_for_whitespace, non_constant_identifier_names
 
 import 'package:animate_do/animate_do.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:order_processing/views/loginScreen.dart';
+
+import '../services/signUpService.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -13,6 +17,11 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController SignupEmailController = TextEditingController();
+  TextEditingController SignupPasswordController = TextEditingController();
+
+  User? currentUser = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,12 +47,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                   ),
-                    const SizedBox(
+                  const SizedBox(
                     height: 40,
                   ),
                   FadeInLeft(
                     duration: const Duration(milliseconds: 1800),
                     child: TextFormField(
+                      controller: usernameController,
                       decoration: InputDecoration(
                         hintText: 'UserName',
                         labelText: 'UserName',
@@ -60,6 +70,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   FadeInLeft(
                     duration: const Duration(milliseconds: 1800),
                     child: TextFormField(
+                      controller: SignupEmailController,
                       decoration: InputDecoration(
                         hintText: 'Email',
                         labelText: 'Email',
@@ -76,6 +87,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   FadeInLeft(
                     duration: const Duration(milliseconds: 1800),
                     child: TextFormField(
+                      controller: SignupPasswordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         hintText: 'Passsword',
@@ -91,13 +103,33 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  
                   FadeInUp(
                       duration: const Duration(milliseconds: 1500),
                       child: ElevatedButton(
-                          onPressed: () {
-                            Get.to('');
-                          }, child: const Text('Sign Up'))),
+                          onPressed: () async {
+                            var userName = usernameController.text.trim();
+                            var userEmail = SignupEmailController.text.trim();
+                            var userPassword =
+                                SignupPasswordController.text.trim();
+
+                                EasyLoading.show();
+
+                            await FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(
+                                  email: userEmail,
+                                  password: userPassword,
+                                )
+                                .then(
+                                  (value) => {
+                                    SignUpUser(
+                                      userName,
+                                      userEmail,
+                                      userPassword,
+                                    )
+                                  },
+                                );
+                          },
+                          child: const Text('Sign Up'))),
                   const SizedBox(
                     height: 30,
                   ),
